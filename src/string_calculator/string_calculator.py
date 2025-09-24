@@ -17,9 +17,11 @@ class StringCalculator:
         if numbers == "":
             return 0
 
-        # Handle comma-separated numbers
-        if "," in numbers:
-            number_list = numbers.split(",")
+        # Handle numbers with delimiters (comma and/or newline)
+        if "," in numbers or "\n" in numbers:
+            # Replace newlines with commas to normalize delimiters
+            normalized = numbers.replace("\n", ",")
+            number_list = normalized.split(",")
             return sum(int(num) for num in number_list)
 
         # Handle single number input

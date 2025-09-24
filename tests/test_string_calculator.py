@@ -43,3 +43,21 @@ class TestStringCalculator:
         calculator = StringCalculator()
         result = calculator.add("1,2,3,4,5,6,7,8,9,10")
         assert result == 55
+
+    def test_newline_separated_numbers(self):
+        """Test that newline-separated numbers return their sum"""
+        calculator = StringCalculator()
+        result = calculator.add("1\n2\n3")
+        assert result == 6
+
+    def test_multiple_newline_separated_numbers(self):
+        """Test that multiple newline-separated numbers work correctly"""
+        calculator = StringCalculator()
+        result = calculator.add("1\n2\n3\n4\n5")
+        assert result == 15
+
+    def test_mixed_comma_and_newline_delimiters(self):
+        """Test that mixed comma and newline delimiters work correctly"""
+        calculator = StringCalculator()
+        result = calculator.add("1\n2,3")
+        assert result == 6

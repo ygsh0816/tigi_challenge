@@ -1,6 +1,11 @@
 """String Calculator implementation following TDD approach."""
 
 
+class NegativeNumberException(Exception):
+    """Exception raised when negative numbers are provided to the calculator."""
+    pass
+
+
 class StringCalculator:
     """A calculator that processes strings of numbers and returns their sum."""
 
@@ -19,6 +24,10 @@ class StringCalculator:
 
         # Parse numbers using appropriate delimiter
         number_list = self._parse_numbers(numbers)
+        
+        # Validate that no negative numbers are present
+        self._validate_numbers(number_list)
+        
         return sum(number_list)
 
     def _extract_delimiter(self, input_str: str) -> tuple[str, str]:
@@ -68,3 +77,18 @@ class StringCalculator:
                 number_strings = [numbers_part]
 
         return [int(num) for num in number_strings if num]
+
+    def _validate_numbers(self, numbers: list[int]) -> None:
+        """
+        Validate that no negative numbers are present in the list.
+
+        Args:
+            numbers: List of integers to validate
+
+        Raises:
+            NegativeNumberException: If any negative numbers are found
+        """
+        negative_numbers = [num for num in numbers if num < 0]
+        if negative_numbers:
+            negative_str = ",".join(str(num) for num in negative_numbers)
+            raise NegativeNumberException(f"negative numbers not allowed {negative_str}")

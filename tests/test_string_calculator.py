@@ -1,4 +1,6 @@
+import pytest
 from src.string_calculator import StringCalculator
+from src.string_calculator.string_calculator import NegativeNumberException
 
 
 class TestStringCalculator:
@@ -97,3 +99,35 @@ class TestStringCalculator:
         calculator = StringCalculator()
         result = calculator.add("//|\n1|2|3|4|5")
         assert result == 15
+
+    def test_negative_number_throws_exception(self):
+        """Test that a single negative number throws NegativeNumberException"""
+        calculator = StringCalculator()
+        with pytest.raises(NegativeNumberException) as exc_info:
+            calculator.add("-1")
+        
+        assert str(exc_info.value) == "negative numbers not allowed -1"
+
+    def test_multiple_negative_numbers_throws_exception_with_all_negatives(self):
+        """Test that multiple negative numbers throws exception showing all negatives"""
+        calculator = StringCalculator()
+        with pytest.raises(NegativeNumberException) as exc_info:
+            calculator.add("-1,2,-3")
+        
+        assert str(exc_info.value) == "negative numbers not allowed -1,-3"
+
+    def test_multiple_negative_numbers_with_custom_delimiter(self):
+        """Test that multiple negative numbers work with custom delimiters"""
+        calculator = StringCalculator()
+        with pytest.raises(NegativeNumberException) as exc_info:
+            calculator.add("//;\n-1;2;-3;-4")
+        
+        assert str(exc_info.value) == "negative numbers not allowed -1,-3,-4"
+
+    def test_multiple_negative_numbers_with_newline_delimiter(self):
+        """Test that multiple negative numbers work with newline delimiters"""
+        calculator = StringCalculator()
+        with pytest.raises(NegativeNumberException) as exc_info:
+            calculator.add("-1\n-2\n3")
+        
+        assert str(exc_info.value) == "negative numbers not allowed -1,-2"

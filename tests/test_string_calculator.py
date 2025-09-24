@@ -1,133 +1,107 @@
 import pytest
+
 from src.string_calculator import StringCalculator
-from src.string_calculator.string_calculator import NegativeNumberException
+from src.string_calculator import NegativeNumberError
 
 
-class TestStringCalculator:
-    def test_empty_string_returns_zero(self):
-        """Test that an empty string returns 0"""
-        calculator = StringCalculator()
-        result = calculator.add("")
-        assert result == 0
+@pytest.fixture
+def calculator():
+    """Fixture to provide a StringCalculator instance for tests."""
+    return StringCalculator()
 
-    def test_single_number_returns_that_number(self):
-        """Test that a single number string returns that number as integer"""
-        calculator = StringCalculator()
-        result = calculator.add("1")
-        assert result == 1
 
-    def test_single_number_with_different_value(self):
-        """Test that single number functionality works with different values"""
-        calculator = StringCalculator()
-        result = calculator.add("5")
-        assert result == 5
+class TestBasicFunctionality:
+    """Test basic calculator functionality with simple inputs."""
 
-    def test_two_comma_separated_numbers(self):
-        """Test that two comma-separated numbers return their sum"""
-        calculator = StringCalculator()
-        result = calculator.add("1,5")
-        assert result == 6
+    @pytest.mark.parametrize(
+        "input_str,expected",
+        [
+            ("", 0),
+            ("1", 1),
+            ("5", 5),
+        ],
+    )
+    def test_basic_inputs(self, calculator, input_str, expected):
+        """Test basic inputs: empty string, single numbers."""
+        assert calculator.add(input_str) == expected
 
-    def test_two_comma_separated_numbers_different_values(self):
-        """Test that two comma-separated numbers work with different values"""
-        calculator = StringCalculator()
-        result = calculator.add("3,7")
-        assert result == 10
+    @pytest.mark.parametrize(
+        "input_str,expected",
+        [
+            ("1,5", 6),
+            ("3,7", 10),
+            ("2,4,6,8,10", 30),
+            ("1,2,3,4,5,6,7,8,9,10", 55),
+        ],
+    )
+    def test_comma_separated_numbers(self, calculator, input_str, expected):
+        """Test comma-separated numbers with various quantities."""
+        assert calculator.add(input_str) == expected
 
-    def test_multiple_comma_separated_numbers_different_values(self):
-        """Test that multiple comma-separated numbers work with different values"""
-        calculator = StringCalculator()
-        result = calculator.add("2,4,6,8,10")
-        assert result == 30
 
-    def test_many_comma_separated_numbers(self):
-        """Test that many comma-separated numbers work correctly"""
-        calculator = StringCalculator()
-        result = calculator.add("1,2,3,4,5,6,7,8,9,10")
-        assert result == 55
+class TestDelimiters:
+    """Test different delimiter support."""
 
-    def test_newline_separated_numbers(self):
-        """Test that newline-separated numbers return their sum"""
-        calculator = StringCalculator()
-        result = calculator.add("1\n2\n3")
-        assert result == 6
+    @pytest.mark.parametrize(
+        "input_str,expected",
+        [
+            ("1\n2\n3", 6),
+            ("1\n2\n3\n4\n5", 15),
+        ],
+    )
+    def test_newline_delimiters(self, calculator, input_str, expected):
+        """Test newline-separated numbers."""
+        assert calculator.add(input_str) == expected
 
-    def test_multiple_newline_separated_numbers(self):
-        """Test that multiple newline-separated numbers work correctly"""
-        calculator = StringCalculator()
-        result = calculator.add("1\n2\n3\n4\n5")
-        assert result == 15
+    @pytest.mark.parametrize(
+        "input_str,expected",
+        [
+            ("1\n2,3", 6),
+            ("10,20\n30,40\n50", 150),
+        ],
+    )
+    def test_mixed_delimiters(self, calculator, input_str, expected):
+        """Test mixed comma and newline delimiters."""
+        assert calculator.add(input_str) == expected
 
-    def test_mixed_comma_and_newline_delimiters(self):
-        """Test that mixed comma and newline delimiters work correctly"""
-        calculator = StringCalculator()
-        result = calculator.add("1\n2,3")
-        assert result == 6
+    @pytest.mark.parametrize(
+        "input_str,expected",
+        [
+            ("//;\n1;2", 3),
+            ("//|\n1|2|3", 6),
+            ("//#\n5#10#15", 30),
+            ("//;\n1;2;3", 6),
+            ("//|\n1|2|3|4|5", 15),
+        ],
+    )
+    def test_custom_delimiters(self, calculator, input_str, expected):
+        """Test custom delimiter functionality."""
+        assert calculator.add(input_str) == expected
 
-    def test_mixed_delimiters_complex_pattern(self):
-        """Test that complex mixed delimiter patterns work correctly"""
-        calculator = StringCalculator()
-        result = calculator.add("10,20\n30,40\n50")
-        assert result == 150
 
-    def test_custom_delimiter_semicolon(self):
-        """Test that custom delimiter with semicolon works correctly"""
-        calculator = StringCalculator()
-        result = calculator.add("//;\n1;2")
-        assert result == 3
+class TestNegativeNumbers:
+    """Test negative number validation."""
 
-    def test_custom_delimiter_pipe(self):
-        """Test that custom delimiter with pipe works correctly"""
-        calculator = StringCalculator()
-        result = calculator.add("//|\n1|2|3")
-        assert result == 6
-
-    def test_custom_delimiter_hash(self):
-        """Test that custom delimiter with hash works correctly"""
-        calculator = StringCalculator()
-        result = calculator.add("//#\n5#10#15")
-        assert result == 30
-
-    def test_custom_delimiter_overrides_default(self):
-        """Test that custom delimiter overrides default comma delimiter"""
-        calculator = StringCalculator()
-        result = calculator.add("//;\n1;2;3")
-        assert result == 6  # Should use semicolon as delimiter, ignoring default comma behavior
-
-    def test_custom_delimiter_with_multiple_numbers(self):
-        """Test that custom delimiter works with multiple numbers"""
-        calculator = StringCalculator()
-        result = calculator.add("//|\n1|2|3|4|5")
-        assert result == 15
-
-    def test_negative_number_throws_exception(self):
-        """Test that a single negative number throws NegativeNumberException"""
-        calculator = StringCalculator()
-        with pytest.raises(NegativeNumberException) as exc_info:
+    def test_single_negative_number(self, calculator):
+        """Test that a single negative number throws exception with correct message."""
+        expected_message = "negative numbers not allowed -1"
+        with pytest.raises(NegativeNumberError, match=expected_message):
             calculator.add("-1")
-        
-        assert str(exc_info.value) == "negative numbers not allowed -1"
 
-    def test_multiple_negative_numbers_throws_exception_with_all_negatives(self):
-        """Test that multiple negative numbers throws exception showing all negatives"""
-        calculator = StringCalculator()
-        with pytest.raises(NegativeNumberException) as exc_info:
+    def test_multiple_negative_numbers_comma_separated(self, calculator):
+        """Test multiple negative numbers with comma delimiter."""
+        expected_message = "negative numbers not allowed -1,-3"
+        with pytest.raises(NegativeNumberError, match=expected_message):
             calculator.add("-1,2,-3")
-        
-        assert str(exc_info.value) == "negative numbers not allowed -1,-3"
 
-    def test_multiple_negative_numbers_with_custom_delimiter(self):
-        """Test that multiple negative numbers work with custom delimiters"""
-        calculator = StringCalculator()
-        with pytest.raises(NegativeNumberException) as exc_info:
+    def test_multiple_negative_numbers_custom_delimiter(self, calculator):
+        """Test multiple negative numbers with custom delimiter."""
+        expected_message = "negative numbers not allowed -1,-3,-4"
+        with pytest.raises(NegativeNumberError, match=expected_message):
             calculator.add("//;\n-1;2;-3;-4")
-        
-        assert str(exc_info.value) == "negative numbers not allowed -1,-3,-4"
 
-    def test_multiple_negative_numbers_with_newline_delimiter(self):
-        """Test that multiple negative numbers work with newline delimiters"""
-        calculator = StringCalculator()
-        with pytest.raises(NegativeNumberException) as exc_info:
+    def test_multiple_negative_numbers_newline_delimiter(self, calculator):
+        """Test multiple negative numbers with newline delimiter."""
+        expected_message = "negative numbers not allowed -1,-2"
+        with pytest.raises(NegativeNumberError, match=expected_message):
             calculator.add("-1\n-2\n3")
-        
-        assert str(exc_info.value) == "negative numbers not allowed -1,-2"

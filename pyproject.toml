@@ -36,8 +36,19 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 
+[tool.mypy]
+python_version = "3.12"
+strict = true
+explicit_package_bases = true
+namespace_packages = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",
     "ruff>=0.13.1",
+    "mypy>=1.8.0",
 ]

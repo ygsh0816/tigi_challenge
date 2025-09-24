@@ -1,13 +1,14 @@
-.PHONY: help install test lint format check clean
+.PHONY: help install test lint format typecheck check clean
 
 help:
 	@echo "Available commands:"
-	@echo "  install  - Install dependencies"
-	@echo "  test     - Run tests"
-	@echo "  lint     - Run linting"
-	@echo "  format   - Format code"
-	@echo "  check    - Run linting and tests"
-	@echo "  clean    - Clean up temporary files"
+	@echo "  install   - Install dependencies"
+	@echo "  test      - Run tests"
+	@echo "  lint      - Run linting"
+	@echo "  format    - Format code"
+	@echo "  typecheck - Run type checking with mypy"
+	@echo "  check     - Run linting, type checking, and tests"
+	@echo "  clean     - Clean up temporary files"
 
 install:
 	uv sync --dev
@@ -21,7 +22,10 @@ lint:
 format:
 	uv run ruff format .
 
-check: lint test
+typecheck:
+	PYTHONPATH=src uv run mypy src/string_calculator tests/
+
+check: lint typecheck test
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +

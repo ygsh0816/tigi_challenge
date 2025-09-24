@@ -17,5 +17,5 @@ class StringCalculator:
         if numbers == "":
             return 0
 
-        # Placeholder for future implementations
-        return 0
+        # Handle single number input
+        return int(numbers)

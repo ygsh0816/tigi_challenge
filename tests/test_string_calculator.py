@@ -19,3 +19,15 @@ class TestStringCalculator:
         calculator = StringCalculator()
         result = calculator.add("5")
         assert result == 5
+
+    def test_two_comma_separated_numbers(self):
+        """Test that two comma-separated numbers return their sum"""
+        calculator = StringCalculator()
+        result = calculator.add("1,5")
+        assert result == 6
+
+    def test_two_comma_separated_numbers_different_values(self):
+        """Test that two comma-separated numbers work with different values"""
+        calculator = StringCalculator()
+        result = calculator.add("3,7")
+        assert result == 10

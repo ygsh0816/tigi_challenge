@@ -61,3 +61,39 @@ class TestStringCalculator:
         calculator = StringCalculator()
         result = calculator.add("1\n2,3")
         assert result == 6
+
+    def test_mixed_delimiters_complex_pattern(self):
+        """Test that complex mixed delimiter patterns work correctly"""
+        calculator = StringCalculator()
+        result = calculator.add("10,20\n30,40\n50")
+        assert result == 150
+
+    def test_custom_delimiter_semicolon(self):
+        """Test that custom delimiter with semicolon works correctly"""
+        calculator = StringCalculator()
+        result = calculator.add("//;\n1;2")
+        assert result == 3
+
+    def test_custom_delimiter_pipe(self):
+        """Test that custom delimiter with pipe works correctly"""
+        calculator = StringCalculator()
+        result = calculator.add("//|\n1|2|3")
+        assert result == 6
+
+    def test_custom_delimiter_hash(self):
+        """Test that custom delimiter with hash works correctly"""
+        calculator = StringCalculator()
+        result = calculator.add("//#\n5#10#15")
+        assert result == 30
+
+    def test_custom_delimiter_overrides_default(self):
+        """Test that custom delimiter overrides default comma delimiter"""
+        calculator = StringCalculator()
+        result = calculator.add("//;\n1;2;3")
+        assert result == 6  # Should use semicolon as delimiter, ignoring default comma behavior
+
+    def test_custom_delimiter_with_multiple_numbers(self):
+        """Test that custom delimiter works with multiple numbers"""
+        calculator = StringCalculator()
+        result = calculator.add("//|\n1|2|3|4|5")
+        assert result == 15

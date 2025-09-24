@@ -31,3 +31,15 @@ class TestStringCalculator:
         calculator = StringCalculator()
         result = calculator.add("3,7")
         assert result == 10
+
+    def test_multiple_comma_separated_numbers_different_values(self):
+        """Test that multiple comma-separated numbers work with different values"""
+        calculator = StringCalculator()
+        result = calculator.add("2,4,6,8,10")
+        assert result == 30
+
+    def test_many_comma_separated_numbers(self):
+        """Test that many comma-separated numbers work correctly"""
+        calculator = StringCalculator()
+        result = calculator.add("1,2,3,4,5,6,7,8,9,10")
+        assert result == 55
